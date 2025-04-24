@@ -1,0 +1,26 @@
+{
+    "global_rules": {
+      "travamento_apos_lote": 3, 
+      "liberacao_automatica": true 
+    },
+    "lotes": [
+      {
+        "lote": 1,
+        "descricao": "Primeiro lote exclusivo!",
+        "atracoes": ["DJ A", "Banda B"],
+        "mais_info": "Ingressos limitados com preço especial.",
+        "meta": 100,
+        "preco": 50.00,
+        "status": "active" 
+      },
+      {
+        "lote": 2,
+        "descricao": "Segundo lote...",
+        "atracoes": ["DJ C", "Banda D"],
+        "mais_info": "Preço do segundo lote.",
+        "meta": 150,
+        "preco": 75.00,
+        "status": "pending"
+      }
+    ]
+  }
