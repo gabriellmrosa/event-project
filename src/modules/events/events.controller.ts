@@ -33,7 +33,6 @@ export const getEventById = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    console.log('📦 Requisição recebida:', req.body);
     const { name, description, start_date, end_date, location, organizer, status } = req.body;
 
     if (!name || !start_date || !end_date || !status) {

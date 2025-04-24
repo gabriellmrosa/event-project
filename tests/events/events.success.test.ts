@@ -8,9 +8,7 @@ let eventId: number;
 
 describe('LOTE CRUD', () => {
   beforeAll(async () => {
-    console.log('🧪 Criando evento antes dos testes de lote:', event);
     const res = await apiRequest.post('/api/v1/events', event);
-    console.log('🚨 RESPOSTA criação de evento para lotes:', res.body);
     eventId = res.body.data?.id; // Adiciona segurança contra erro de undefined
   });
 

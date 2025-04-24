@@ -16,7 +16,6 @@ describe('LOTE CRUD', () => {
   it('should create a new lote for the event', async () => {
     const lote = getValidLoteData(now, nextMonth, eventId);
     const res = await apiRequest.post(`/api/v1/events/${eventId}/lotes`, lote);
-    console.log('🎯 Lote response:', res.body); // <--- ADICIONE
     loteId = res.body.data.id;
 
     expect(res.status).toBe(201);
