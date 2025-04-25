@@ -1,43 +1,95 @@
 import { Request, Response } from 'express';
-import { Event } from '../models/eventModel';
+import {
+  createEvent as createEventService,
+  getAllEvents as getAllEventsService,
+  getEventByIdFromDB,
+  updateEventInDB,
+  deleteEventFromDB,
+} from '../services/eventServices';
+import { isValidUUID } from '../utils/isValidUUID';
 
-let events: Event[] = [];
-
-export const getAllEvents = (req: Request, res: Response): Response => {
-  return res.json(events);
-};
-
-export const getEventById = (req: Request, res: Response): Response => {
-  const event = events.find((e) => e.id === req.params.id);
-  if (!event) {
-    return res.status(404).json({ message: 'Evento não encontrado' });
+export const getAllEvents = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const events = await getAllEventsService();
+    return res.json(events);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao buscar eventos' });
   }
-  return res.json(event);
 };
 
-export const createEvent = (req: Request, res: Response): Response => {
-  const newEvent: Event = {
-    id: Date.now().toString(),
-    ...req.body,
-  };
-  events.push(newEvent);
-  return res.status(201).json(newEvent);
-};
+export const getEventById = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id = req.params.id;
 
-export const updateEvent = (req: Request, res: Response): Response => {
-  const index = events.findIndex((e) => e.id === req.params.id);
-  if (index === -1) {
-    return res.status(404).json({ message: 'Evento não encontrado' });
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ message: 'ID inválido (não é um UUID)' });
   }
-  events[index] = { ...events[index], ...req.body };
-  return res.json(events[index]);
+
+  try {
+    const event = await getEventByIdFromDB(id);
+    if (!event) {
+      return res.status(404).json({ message: 'Evento não encontrado' });
+    }
+    return res.json(event);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao buscar evento' });
+  }
 };
 
-export const deleteEvent = (req: Request, res: Response): Response => {
-  const index = events.findIndex((e) => e.id === req.params.id);
-  if (index === -1) {
-    return res.status(404).json({ message: 'Evento não encontrado' });
+export const createEvent = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const newEvent = await createEventService(req.body);
+    return res.status(201).json(newEvent);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao criar evento' });
   }
-  events.splice(index, 1);
-  return res.status(204).send();
+};
+
+export const updateEvent = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const eventId = req.params.id;
+    const updatedEvent = await updateEventInDB(eventId, req.body);
+
+    if (!updatedEvent) {
+      return res.status(404).json({ message: 'Evento não encontrado' });
+    }
+
+    return res.json(updatedEvent);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao atualizar evento' });
+  }
+};
+
+export const deleteEvent = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const eventId = req.params.id;
+    const deleted = await deleteEventFromDB(eventId);
+
+    if (!deleted) {
+      return res.status(404).json({ message: 'Evento não encontrado' });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao deletar evento' });
+  }
 };

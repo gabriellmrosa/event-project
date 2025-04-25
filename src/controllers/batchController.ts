@@ -1,51 +1,113 @@
 import { Request, Response } from 'express';
-import { Batch } from '../models/batchModel';
+import {
+  getBatchesByEventId,
+  getBatchById,
+  createBatch as createBatchService,
+  updateBatch as updateBatchService,
+  deleteBatch as deleteBatchService,
+} from '../services/batchServices';
+import { isValidUUID } from '../utils/isValidUUID';
 
-let batches: Batch[] = [];
+export const getBatchesByEventIdController = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const eventId = req.params.eventId;
 
-export const getBatchesByEventId = (req: Request, res: Response): Response => {
-  const eventBatches = batches.filter((b) => b.eventId === req.params.eventId);
-  return res.json(eventBatches);
-};
-
-export const getBatchById = (req: Request, res: Response): Response => {
-  const batch = batches.find(
-    (b) => b.id === req.params.id && b.eventId === req.params.eventId
-  );
-  if (!batch) {
-    return res.status(404).json({ message: 'Lote não encontrado' });
+  if (!isValidUUID(eventId)) {
+    return res.status(400).json({ message: 'ID do evento inválido' });
   }
-  return res.json(batch);
-};
 
-export const createBatch = (req: Request, res: Response): Response => {
-  const newBatch: Batch = {
-    id: Date.now().toString(),
-    eventId: req.params.eventId,
-    ...req.body,
-  };
-  batches.push(newBatch);
-  return res.status(201).json(newBatch);
-};
-
-export const updateBatch = (req: Request, res: Response): Response => {
-  const index = batches.findIndex(
-    (b) => b.id === req.params.id && b.eventId === req.params.eventId
-  );
-  if (index === -1) {
-    return res.status(404).json({ message: 'Lote não encontrado' });
+  try {
+    const batches = await getBatchesByEventId(eventId);
+    return res.json(batches);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao buscar lotes' });
   }
-  batches[index] = { ...batches[index], ...req.body };
-  return res.json(batches[index]);
 };
 
-export const deleteBatch = (req: Request, res: Response): Response => {
-  const index = batches.findIndex(
-    (b) => b.id === req.params.id && b.eventId === req.params.eventId
-  );
-  if (index === -1) {
-    return res.status(404).json({ message: 'Lote não encontrado' });
+export const getBatchByIdController = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id = req.params.id;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ message: 'ID do lote inválido' });
   }
-  batches.splice(index, 1);
-  return res.status(204).send();
+
+  try {
+    const batch = await getBatchById(id);
+    if (!batch) {
+      return res.status(404).json({ message: 'Lote não encontrado' });
+    }
+    return res.json(batch);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao buscar lote' });
+  }
+};
+
+export const createBatch = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const eventId = req.params.eventId;
+
+  if (!isValidUUID(eventId)) {
+    return res.status(400).json({ message: 'ID do evento inválido' });
+  }
+
+  try {
+    const newBatch = await createBatchService(eventId, req.body);
+    return res.status(201).json(newBatch);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao criar lote' });
+  }
+};
+
+export const updateBatch = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id = req.params.id;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ message: 'ID do lote inválido' });
+  }
+
+  try {
+    const updated = await updateBatchService(id, req.body);
+    if (!updated) {
+      return res.status(404).json({ message: 'Lote não encontrado' });
+    }
+    return res.json(updated);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao atualizar lote' });
+  }
+};
+
+export const deleteBatch = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const id = req.params.id;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ message: 'ID do lote inválido' });
+  }
+
+  try {
+    const deleted = await deleteBatchService(id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Lote não encontrado' });
+    }
+    return res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao deletar lote' });
+  }
 };
