@@ -7,13 +7,11 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      POSTGRES_DB: 'localdatabase'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: localdatabase
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - internal_net
 
   pgadmin:
     container_name: pgadmin
@@ -21,16 +19,10 @@ services:
     ports:
       - '5050:80'
     environment:
-      PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
-      PGADMIN_DEFAULT_PASSWORD: 'admin'
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
       - postgres_db
-    networks:
-      - internal_net
-
-networks:
-  internal_net:
-    driver: bridge
 
 volumes:
   postgres_data:
