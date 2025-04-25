@@ -1,0 +1,22 @@
+{
+    "name": "Evento Backend Dev",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:20-bullseye",
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "editor.formatOnSave": true,
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "extensions": [
+          "esbenp.prettier-vscode",
+          "dbaeumer.vscode-eslint"
+        ]
+      }
+    },
+    "forwardPorts": [5432, 5050],
+    "postCreateCommand": "npm install",
+    "features": {
+      "docker-in-docker": "latest"
+    }
+  }
+  
