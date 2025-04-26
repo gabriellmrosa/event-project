@@ -1,20 +1,18 @@
 import { Router } from 'express';
 import {
   getAllEvents,
-  getEventById,
+  getSingleEvent,
   createEvent,
   updateEvent,
   deleteEvent,
 } from '../controllers/eventController';
-import { validate } from '../middlewares/validate';
-import { eventSchema } from '../schemas/eventSchema';
 
-const router = Router({ mergeParams: true });
+const router = Router();
 
 router.get('/', getAllEvents);
-router.get('/:id', getEventById);
-router.post('/', validate(eventSchema), createEvent);
-router.put('/:id', validate(eventSchema), updateEvent);
+router.get('/:id', getSingleEvent);
+router.post('/', createEvent);
+router.put('/:id', updateEvent);
 router.delete('/:id', deleteEvent);
 
 export default router;

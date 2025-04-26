@@ -1,95 +1,92 @@
 import { Request, Response } from 'express';
 import {
-  createEvent as createEventService,
-  getAllEvents as getAllEventsService,
-  getEventByIdFromDB,
-  updateEventInDB,
-  deleteEventFromDB,
+  getAllEventsService,
+  getSingleEventService,
+  createEventService,
+  updateEventService,
+  deleteEventService,
 } from '../services/eventServices';
 import { isValidUUID } from '../utils/isValidUUID';
 
-export const getAllEvents = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const getAllEvents = async (req: Request, res: Response) => {
   try {
     const events = await getAllEventsService();
-    return res.json(events);
-  } catch (error) {
+    return res.status(200).json(events);
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao buscar eventos' });
+    return res.status(500).json({ message: error.message });
   }
 };
 
-export const getEventById = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const getSingleEvent = async (req: Request, res: Response) => {
   const id = req.params.id;
 
   if (!isValidUUID(id)) {
-    return res.status(400).json({ message: 'ID inválido (não é um UUID)' });
+    return res.status(400).json({ message: 'ID inválido' });
   }
 
   try {
-    const event = await getEventByIdFromDB(id);
+    const event = await getSingleEventService(id);
+
     if (!event) {
       return res.status(404).json({ message: 'Evento não encontrado' });
     }
-    return res.json(event);
-  } catch (error) {
+
+    return res.status(200).json(event);
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao buscar evento' });
+    return res.status(500).json({ message: error.message });
   }
 };
 
-export const createEvent = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const createEvent = async (req: Request, res: Response) => {
   try {
-    const newEvent = await createEventService(req.body);
-    return res.status(201).json(newEvent);
-  } catch (error) {
+    const event = await createEventService(req.body);
+    return res.status(201).json(event);
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao criar evento' });
+    return res.status(400).json({ message: error.message });
   }
 };
 
-export const updateEvent = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
-  try {
-    const eventId = req.params.id;
-    const updatedEvent = await updateEventInDB(eventId, req.body);
+export const updateEvent = async (req: Request, res: Response) => {
+  const id = req.params.id;
 
-    if (!updatedEvent) {
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ message: 'ID inválido' });
+  }
+
+  try {
+    const event = await updateEventService(id, req.body);
+
+    if (!event) {
       return res.status(404).json({ message: 'Evento não encontrado' });
     }
 
-    return res.json(updatedEvent);
-  } catch (error) {
+    return res.status(200).json(event);
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao atualizar evento' });
+    return res.status(400).json({ message: error.message });
   }
 };
 
-export const deleteEvent = async (
-  req: Request,
-  res: Response
-): Promise<Response> => {
+export const deleteEvent = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ message: 'ID inválido' });
+  }
+
   try {
-    const eventId = req.params.id;
-    const deleted = await deleteEventFromDB(eventId);
+    const deleted = await deleteEventService(id);
 
     if (!deleted) {
       return res.status(404).json({ message: 'Evento não encontrado' });
     }
 
     return res.status(204).send();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao deletar evento' });
+    return res.status(500).json({ message: error.message });
   }
 };

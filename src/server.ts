@@ -1,12 +1,14 @@
 import app from './app';
-import dotenv from 'dotenv';
+import { Server } from 'http';
 
-dotenv.config();
+const port = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3000;
+let server: Server | undefined;
 
-const server = app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
+}
 
-export { app, server };
+export { server };
