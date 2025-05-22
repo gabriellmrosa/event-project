@@ -56,7 +56,7 @@ Todas as listagens retornam:
       `,
       contact: {
         name: 'API Support',
-        email: 'suporte@evento.com'
+        email: 'support@yourcompany.com'
       },
       license: {
         name: 'MIT',
@@ -69,7 +69,7 @@ Todas as listagens retornam:
         description: 'Servidor de Desenvolvimento'
       },
       {
-        url: 'https://api.evento.com/v1',
+        url: 'https://your-api-domain.com/api/v1',
         description: 'Servidor de Produção'
       }
     ],

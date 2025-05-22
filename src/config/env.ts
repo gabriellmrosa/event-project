@@ -1,21 +1,22 @@
 import { z } from 'zod';
 
 const isTestEnv = process.env.NODE_ENV === 'test';
+const isDemoMode = !process.env.DB_HOST || process.env.DEMO_MODE === 'true';
 
 const envSchema = z.object({
-  DB_HOST: z.string().min(1, 'DB_HOST é obrigatório').default(isTestEnv ? 'localhost' : ''),
+  DB_HOST: z.string().min(1, 'DB_HOST é obrigatório').default(isDemoMode ? 'localhost' : ''),
   DB_PORT: z.string().transform((val) => {
-    if (!val && isTestEnv) return 5432;
+    if (!val && (isTestEnv || isDemoMode)) return 5432;
     const port = Number(val);
     if (isNaN(port) || port <= 0 || port > 65535) {
-      if (isTestEnv) return 5432;
+      if (isTestEnv || isDemoMode) return 5432;
       throw new Error('DB_PORT deve ser um número válido entre 1 e 65535');
     }
     return port;
-  }).default(isTestEnv ? '5432' : ''),
-  DB_NAME: z.string().min(1, 'DB_NAME é obrigatório').default(isTestEnv ? 'test_db' : ''),
-  DB_USER: z.string().min(1, 'DB_USER é obrigatório').default(isTestEnv ? 'test_user' : ''),
-  DB_PASSWORD: z.string().min(1, 'DB_PASSWORD é obrigatório').default(isTestEnv ? 'test_password' : ''),
+  }).default((isTestEnv || isDemoMode) ? '5432' : ''),
+  DB_NAME: z.string().min(1, 'DB_NAME é obrigatório').default((isTestEnv || isDemoMode) ? 'demo_db' : ''),
+  DB_USER: z.string().min(1, 'DB_USER é obrigatório').default((isTestEnv || isDemoMode) ? 'demo_user' : ''),
+  DB_PASSWORD: z.string().min(1, 'DB_PASSWORD é obrigatório').default((isTestEnv || isDemoMode) ? 'demo_password' : ''),
   PORT: z.string().transform((val) => {
     const port = Number(val);
     if (isNaN(port) || port <= 0 || port > 65535) {

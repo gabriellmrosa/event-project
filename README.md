@@ -305,13 +305,13 @@ npm run migrate     # Executar migrações
 ### Variáveis de Ambiente - Produção
 ```env
 NODE_ENV=production
-DB_HOST=seu-host-producao
+DB_HOST=your-production-host
 DB_PORT=5432
-DB_NAME=evento_db_prod
-DB_USER=usuario_prod
-DB_PASSWORD=senha_segura
+DB_NAME=your_production_db
+DB_USER=your_prod_user
+DB_PASSWORD=your_secure_password
 PORT=80
-ALLOWED_ORIGINS=https://seudominio.com,https://app.seudominio.com
+ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 ```
 
 ### Docker (opcional)
