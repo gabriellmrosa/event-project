@@ -5,7 +5,10 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   testMatch: ['**/tests/**/*.test.ts'],
   verbose: true,
-  setupFilesAfterEnv: ['<rootDir>/tests/setup/setupTests.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/tests/setup/mockDatabase.ts',
+    '<rootDir>/tests/setup/setupTests.ts'
+  ],
   detectOpenHandles: true,
   clearMocks: true,
 };

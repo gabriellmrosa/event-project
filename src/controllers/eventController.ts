@@ -1,31 +1,55 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import {
   getAllEventsService,
   getSingleEventService,
   createEventService,
   updateEventService,
   deleteEventService,
+  searchEventsService,
+  getTotalEventsCountService,
 } from '../services/eventServices';
-import { isValidUUID } from '../utils/isValidUUID';
+import { EventFilters } from '../types/event';
+import { getPaginationParams, getOffset, createPaginationResponse } from '../utils/pagination';
 
-export const getAllEvents = async (req: Request, res: Response) => {
+export const getAllEvents = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const events = await getAllEventsService();
-    return res.status(200).json(events);
-  } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({ message: error.message });
+    const { page, limit } = getPaginationParams(req);
+    const offset = getOffset(page, limit);
+
+    const hasFilters = req.query.name || req.query.status || req.query.dateFrom || req.query.dateTo;
+
+    if (hasFilters) {
+      const filters: EventFilters = {
+        name: req.query.name as string,
+        status: req.query.status as 'DRAFT' | 'PUBLISHED',
+        dateFrom: req.query.dateFrom as string,
+        dateTo: req.query.dateTo as string,
+      };
+
+      const [events, total] = await Promise.all([
+        searchEventsService(filters, limit, offset),
+        getTotalEventsCountService(filters),
+      ]);
+
+      const response = createPaginationResponse(events, total, page, limit);
+      return res.status(200).json(response);
+    }
+
+    const [events, total] = await Promise.all([
+      getAllEventsService(limit, offset),
+      getTotalEventsCountService(),
+    ]);
+
+    const response = createPaginationResponse(events, total, page, limit);
+    return res.status(200).json(response);
+  } catch (error) {
+    next(error);
   }
 };
 
-export const getSingleEvent = async (req: Request, res: Response) => {
-  const id = req.params.id;
-
-  if (!isValidUUID(id)) {
-    return res.status(400).json({ message: 'ID inválido' });
-  }
-
+export const getSingleEvent = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { id } = req.params;
     const event = await getSingleEventService(id);
 
     if (!event) {
@@ -33,30 +57,23 @@ export const getSingleEvent = async (req: Request, res: Response) => {
     }
 
     return res.status(200).json(event);
-  } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({ message: error.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const createEvent = async (req: Request, res: Response) => {
+export const createEvent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const event = await createEventService(req.body);
     return res.status(201).json(event);
-  } catch (error: any) {
-    console.error(error);
-    return res.status(400).json({ message: error.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const updateEvent = async (req: Request, res: Response) => {
-  const id = req.params.id;
-
-  if (!isValidUUID(id)) {
-    return res.status(400).json({ message: 'ID inválido' });
-  }
-
+export const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { id } = req.params;
     const event = await updateEventService(id, req.body);
 
     if (!event) {
@@ -64,20 +81,14 @@ export const updateEvent = async (req: Request, res: Response) => {
     }
 
     return res.status(200).json(event);
-  } catch (error: any) {
-    console.error(error);
-    return res.status(400).json({ message: error.message });
+  } catch (error) {
+    next(error);
   }
 };
 
-export const deleteEvent = async (req: Request, res: Response) => {
-  const id = req.params.id;
-
-  if (!isValidUUID(id)) {
-    return res.status(400).json({ message: 'ID inválido' });
-  }
-
+export const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { id } = req.params;
     const deleted = await deleteEventService(id);
 
     if (!deleted) {
@@ -85,8 +96,7 @@ export const deleteEvent = async (req: Request, res: Response) => {
     }
 
     return res.status(204).send();
-  } catch (error: any) {
-    console.error(error);
-    return res.status(500).json({ message: error.message });
+  } catch (error) {
+    next(error);
   }
 };
