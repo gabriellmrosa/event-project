@@ -83,6 +83,30 @@ ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
 DEBUG_TESTS=true
 ```
 
+## 📚 **Documentação Automática**
+
+### **Swagger/OpenAPI 3.0**
+A API possui documentação automática gerada com Swagger. Acesse:
+
+```
+http://localhost:3000/api/docs
+```
+
+**Funcionalidades da Documentação:**
+- ✅ **Exploração interativa** de todos os endpoints
+- ✅ **Teste direto** das APIs no navegador
+- ✅ **Schemas detalhados** com exemplos
+- ✅ **Códigos de resposta** com descrições
+- ✅ **Filtros e paginação** documentados
+- ✅ **Validações** e regras de negócio explicadas
+
+### **Interface Profissional:**
+- 🎨 Interface limpa e intuitiva
+- 🔍 Busca e filtros nos endpoints
+- ⚡ Teste direto com dados reais
+- 📱 Responsiva para mobile
+- 🔧 Configurações personalizadas
+
 ## 📍 Endpoints da API
 
 ### 🔍 **Health Check**

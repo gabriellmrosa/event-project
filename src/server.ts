@@ -9,6 +9,7 @@ if (env.NODE_ENV !== 'test') {
     console.log(`🚀 Servidor rodando na porta ${env.PORT}`);
     console.log(`📋 Health check: http://localhost:${env.PORT}/api/health`);
     console.log(`📖 API Base: http://localhost:${env.PORT}/api/v1`);
+    console.log(`📚 Documentação: http://localhost:${env.PORT}/api/docs`);
     console.log(`🌍 Ambiente: ${env.NODE_ENV}`);
   });
 

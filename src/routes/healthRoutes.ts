@@ -3,6 +3,48 @@ import pool from '../config/database';
 
 const router = Router();
 
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Verificação de status da API
+ *     description: Endpoint para verificar se a API e seus serviços estão funcionando corretamente
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: API funcionando corretamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthCheck'
+ *             example:
+ *               status: "healthy"
+ *               timestamp: "2024-01-01T12:00:00.000Z"
+ *               services:
+ *                 database:
+ *                   status: "connected"
+ *                   responseTime: "15ms"
+ *                 api:
+ *                   status: "running"
+ *                   uptime: 3600
+ *                   version: "1.0.0"
+ *       503:
+ *         description: Serviços indisponíveis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthCheck'
+ *             example:
+ *               status: "unhealthy"
+ *               timestamp: "2024-01-01T12:00:00.000Z"
+ *               services:
+ *                 database:
+ *                   status: "disconnected"
+ *                   error: "Failed to connect to database"
+ *                 api:
+ *                   status: "running"
+ *                   uptime: 3600
+ */
 router.get('/health', async (req: Request, res: Response) => {
   try {
     const startTime = Date.now();
